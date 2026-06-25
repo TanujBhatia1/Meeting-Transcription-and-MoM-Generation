@@ -1,0 +1,48 @@
+version: '3.8'
+services:
+  backend:
+    build:
+      context: ./meeting_assistant
+      dockerfile: backend/Dockerfile
+    container_name: meeting-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/meetings
+      - REDIS_URL=redis://redis:6379/0
+      - LLAMA_MODEL_PATH=/models/llama-2-7b-chat.gguf  # if using local LLM
+      - OPENAI_API_KEY=     # if using OpenAI
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    image: postgres:15
+    container_name: meeting-postgres
+    environment:
+      POSTGRES_DB: meetings
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7
+    container_name: meeting-redis
+    ports:
+      - "6379:6379"
+
+  frontend:
+    build:
+      context: ./meeting_assistant
+      dockerfile: frontend/Dockerfile
+    container_name: meeting-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:

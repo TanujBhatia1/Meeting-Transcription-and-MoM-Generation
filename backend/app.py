@@ -1,0 +1,30 @@
+# backend/app.py
+import os
+import logging
+from fastapi import FastAPI, WebSocket, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+
+from routers.audio import audio_router
+from services.asr import init_asr_model
+from services.summarizer import init_summarizer
+from services.diarization import init_diarization
+
+app = FastAPI()
+app.include_router(audio_router, prefix="/api")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # in prod, limit to your domain
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.on_event("startup")
+async def startup_event():
+    logging.basicConfig(level=logging.INFO)
+    logging.info("Loading ASR model...")
+    init_asr_model(model_size="small.en", device="cpu", compute_type="int8")  # quantized faster-whisper
+    logging.info("Loading summarizer LLM (if any)...")
+    init_summarizer()
+    logging.info("Startup complete.")

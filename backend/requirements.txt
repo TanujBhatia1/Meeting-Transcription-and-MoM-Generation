@@ -1,11 +1,25 @@
 fastapi
 uvicorn==0.24.0
+
+# ASR
 faster-whisper==1.1.0
-silero-vad==6.2.0  # loaded via torch.hub
-torch    # Silero VAD dependency
+silero-vad==6.2.0
+torch
+
+# Database
 psycopg2-binary
 redis
-diarize>=0.1.2   # FoxNoseTech diarize
+
+# Speaker
+diarize>=0.1.2
 resemblyzer>=0.1.3
-llama-cpp-python
+
+# API Providers
+huggingface_hub
+groq
+httpx
 openai
+
+# Config
+pydantic-settings
+python-dotenv

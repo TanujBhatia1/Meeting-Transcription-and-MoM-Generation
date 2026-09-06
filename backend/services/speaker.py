@@ -1,6 +1,6 @@
 # backend/services/speaker.py
-import numpy as np
-from resemblyzer import VoiceEncoder
+from ai.registry.service_registry import registry
+
 import psycopg2
 from psycopg2.extras import Json
 
@@ -9,7 +9,7 @@ class SpeakerID:
     Handles speaker enrollment and identification with pgvector.
     """
     def __init__(self):
-        self.encoder = VoiceEncoder()
+        self.encoder = registry.get("speaker")
         self.conn = psycopg2.connect(dbname="meetings", user="user", password="pass")
 
     def enroll(self, user_id: int, audio_path: str):

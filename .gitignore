@@ -11,3 +11,6 @@ env_mom
 # But DO commit the template so teammates know what variables to set
 !.env.example
 !.env.sample
+
+\code_to_text
+\Backend_Codebase

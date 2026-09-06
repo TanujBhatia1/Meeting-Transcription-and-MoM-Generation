@@ -1,6 +1,8 @@
 # backend/services/diarization.py
 import os
-from diarize import diarize as run_diarize
+from ai.registry.service_registry import registry
+
+diarizer = registry.get("diarization")
 
 class Diarizer:
     """
@@ -14,7 +16,7 @@ class Diarizer:
         Run diarization on a WAV/PCM file and return list of segments.
         Each segment has .start, .end, .speaker attributes.
         """
-        result = run_diarize(filename)
+        result = diarizer.diarize(filename)
         return result.segments  # list of segments with .start, .end, .speaker
 
     def process_array(self, audio_samples, sample_rate=16000):
@@ -24,7 +26,7 @@ class Diarizer:
         temp_path = "temp_meeting.wav"
         # Write audio_samples (numpy) to WAV file (not shown for brevity)
         # ...
-        segments = run_diarize(temp_path).segments
+        segments = diarizer.diarize(temp_path).segments
         os.remove(temp_path)
         return segments
 

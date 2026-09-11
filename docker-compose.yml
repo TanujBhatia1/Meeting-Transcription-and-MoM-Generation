@@ -16,17 +16,26 @@ services:
       - postgres
       - redis
 
+
   postgres:
-    image: postgres:15
+    image: pgvector/pgvector:pg16
     container_name: meeting-postgres
+    restart: unless-stopped
     environment:
       POSTGRES_DB: meetings
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-    volumes:
-      - pgdata:/var/lib/postgresql/data
+      POSTGRES_USER: meeting_user
+      POSTGRES_PASSWORD: meeting_password
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U meeting_user -d meetings"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
 
   redis:
     image: redis:7
@@ -45,4 +54,4 @@ services:
       - backend
 
 volumes:
-  pgdata:
+  postgres_data:

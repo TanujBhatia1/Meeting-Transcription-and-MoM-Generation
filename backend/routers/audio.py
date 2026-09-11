@@ -1,5 +1,7 @@
 # backend/routers/audio.py
 import io, time
+from uuid import UUID
+from fastapi import Query
 from fastapi import APIRouter, WebSocket, Depends, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
@@ -13,12 +15,10 @@ router = APIRouter()
 auth = HTTPBearer()  # Token-based auth (bearer)
 
 @router.websocket("/ws/asr")
-async def asr_websocket(websocket: WebSocket, token: HTTPAuthorizationCredentials = Depends(auth)):
-    """
-    Receives audio chunks from browser (PCM/WebM), applies VAD and ASR, and sends back transcripts in real-time.
-    """
+async def asr_websocket( websocket: WebSocket, meeting_id: UUID = Query(...)):
     await websocket.accept()
-    # TODO: verify token.token
+    # Validate meeting_id and user permissions here.
+    
     vad = VoiceActivityDetector()
     speaker_id = SpeakerID()      # handles enrollment lookup
     diar = Diarizer()            # can accumulate or run at end

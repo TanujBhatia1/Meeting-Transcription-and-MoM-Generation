@@ -4,7 +4,11 @@ import logging
 from fastapi import FastAPI, WebSocket, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers.audio import audio_router
+from routers.audio import router as audio_router
+from routers.agenda import router as agenda_router
+from routers.meetings import router as meetings_router
+from routers.chat import router as chat_router
+
 # from services.asr import init_asr_model
 from services.summarizer import init_summarizer
 # from services.diarization import init_diarization
@@ -15,6 +19,9 @@ from ai.config.ai_config import settings
 
 app = FastAPI()
 app.include_router(audio_router, prefix="/api")
+app.include_router(agenda_router, prefix="/api")
+app.include_router(meetings_router, prefix="/api")
+app.include_router(chat_router, prefix="/api")
 
 app.add_middleware(
     CORSMiddleware,

@@ -1,25 +1,18 @@
 fastapi
 uvicorn==0.24.0
-
-# ASR
 faster-whisper==1.1.0
 silero-vad==6.2.0
 torch
-
-# Database
 psycopg2-binary
 redis
-
-# Speaker
-diarize>=0.1.2
+pyannote.audio==3.1  # or diarizen if you prefer
 resemblyzer>=0.1.3
-
-# API Providers
-huggingface_hub
-groq
-httpx
+llama-cpp-python
 openai
-
-# Config
+python-multipart
+pdfplumber
+python-docx
+markdown
 pydantic-settings
 python-dotenv
+pgvector

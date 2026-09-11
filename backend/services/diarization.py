@@ -1,38 +1,34 @@
 # backend/services/diarization.py
 import os
-from ai.registry.service_registry import registry
-
-diarizer = registry.get("diarization")
+from pyannote.audio import Pipeline
+from huggingface_hub import login
 
 class Diarizer:
-    """
-    Wraps FoxNoseTech's diarize (CPU-only diarization).
-    """
     def __init__(self):
-        pass
+        hf_token = os.getenv("HUGGING_FACE_HUB_TOKEN")
+        if hf_token:
+            login(token=hf_token)
+        self.pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization-3.1")
 
-    def process_file(self, filename):
-        """
-        Run diarization on a WAV/PCM file and return list of segments.
-        Each segment has .start, .end, .speaker attributes.
-        """
-        result = diarizer.diarize(filename)
-        return result.segments  # list of segments with .start, .end, .speaker
+    def process_file(self, audio_path: str, num_speakers: int = None):
+        diarization = self.pipeline(audio_path)
+        segments = []
+        for turn, _, speaker in diarization.itertracks(yield_label=True):
+            segments.append({
+                "start": turn.start,
+                "end": turn.end,
+                "speaker": speaker
+            })
+        return segments
 
     def process_array(self, audio_samples, sample_rate=16000):
-        """
-        If needed, write array to temp file and diarize.
-        """
+        # Write to temp WAV, then diarize
+        import soundfile as sf
         temp_path = "temp_meeting.wav"
-        # Write audio_samples (numpy) to WAV file (not shown for brevity)
-        # ...
-        segments = diarizer.diarize(temp_path).segments
+        sf.write(temp_path, audio_samples, sample_rate)
+        segments = self.process_file(temp_path)
         os.remove(temp_path)
         return segments
 
 def init_diarization():
-    """
-    If any one-time setup is needed for diarize.
-    """
-    # e.g., download models if necessary
-    return
+    return Diarizer()

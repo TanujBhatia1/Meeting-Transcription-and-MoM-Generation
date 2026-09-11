@@ -8,6 +8,8 @@ env_mom
 .env.production
 .env.test
 
+mom_env
+
 # But DO commit the template so teammates know what variables to set
 !.env.example
 !.env.sample
